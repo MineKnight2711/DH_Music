@@ -6,10 +6,19 @@ class MainScreenController extends GetxController
   late TabController tabController;
   final currentIndex = 3.obs;
 
+  final tabs = const [
+    "Spotify",
+    "D.sách phát",
+    "Album",
+    "Yêu thích",
+    "Nhạc",
+    "Thư mục"
+  ];
+
   @override
   void onInit() {
     tabController = TabController(
-      length: 6,
+      length: tabs.length,
       vsync: this,
       initialIndex: currentIndex.value,
     );
@@ -22,12 +31,8 @@ class MainScreenController extends GetxController
     super.onClose();
   }
 
-  final tabs = const [
-    "Spotify",
-    "D.sách phát",
-    "Album",
-    "Yêu thích",
-    "Nhạc",
-    "Thư mục"
-  ];
+  void changeTabIndex(int index) {
+    currentIndex.value = index;
+    tabController.animateTo(index);
+  }
 }

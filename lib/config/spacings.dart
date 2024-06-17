@@ -1,6 +1,5 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-///Caculate the pixel width and height using package flutter_screenutil
 class AppSpacings {
   static final h5 = 5.h;
   static final h10 = 10.h;
