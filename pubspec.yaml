@@ -12,6 +12,7 @@ dependencies:
 
   get: ^4.6.6
   audioplayers: ^6.0.0
+  card_swiper: ^3.0.1
   cupertino_icons: ^1.0.8
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.0.10+1

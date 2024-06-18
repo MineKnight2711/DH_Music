@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:dh_music/config/config_ex.dart';
 import 'package:dh_music/controller/main_screen_controller.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,7 @@ class MainScreen extends GetView<MainScreenController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.secondaryWhite,
         toolbarHeight: AppSpacings.h30 * 3,
         titleSpacing: 0,
         automaticallyImplyLeading: false,
@@ -44,7 +46,6 @@ class MainScreen extends GetView<MainScreenController> {
             onPressed: () {},
             icon: const Icon(CupertinoIcons.search),
           ),
-          // SizedBox(width: AppSpacings.w15),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.more_vert),
@@ -53,44 +54,150 @@ class MainScreen extends GetView<MainScreenController> {
         bottom: PreferredSize(
           preferredSize: const Size(200, 40),
           child: SizedBox(
-            height: 40,
-            width: AppSpacings.sw(1) - AppSpacings.w10,
-            child: TabBar(
-              isScrollable: true,
-              controller: controller.tabController,
-              dividerHeight: 0,
-              onTap: (value) {
-                controller.currentIndex.value = value;
-              },
-              tabs: controller.tabs.asMap().entries.map((entry) {
-                final index = entry.key;
-                final tab = entry.value;
-                return Tab(
-                  child: Obx(
-                    () => AnimatedScale(
-                      duration: const Duration(milliseconds: 300),
-                      scale: controller.currentIndex.value == index ? 1.4 : 1,
-                      child: Text(
-                        tab,
-                        style: AppFonts.openSans(
-                            fontSize: AppFontSizes.size12,
+              height: 40,
+              width: AppSpacings.sw(1),
+              child: Swiper(
+                controller: controller.swiperController,
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.tabs.length,
+                scale: 0.7,
+                viewportFraction: 0.24,
+                fade: 0.7,
+                loop: false,
+                onIndexChanged: controller.onTabPressed,
+                onTap: controller.swiperController.move,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Container(
+                    alignment: Alignment.center,
+                    width: 200,
+                    height: 20,
+                    child: Obx(
+                      () => AnimatedScale(
+                        duration: const Duration(milliseconds: 200),
+                        scale:
+                            controller.currentIndex.value == index ? 1.4 : 1.1,
+                        child: Text(
+                          controller.tabs[index],
+                          style: AppFonts.openSans(
+                            fontSize: controller.currentIndex.value == index
+                                ? AppFontSizes.size14
+                                : AppFontSizes.size12,
                             color: controller.currentIndex.value == index
                                 ? AppColors.primaryDark
-                                : AppColors.samsungIconGrey.withOpacity(0.5)),
+                                : AppColors.samsungIconGrey,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
-              splashFactory: NoSplash.splashFactory,
-              indicatorColor: Colors.transparent,
-            ),
-          ),
+                  );
+                },
+              )
+              // RotatedBox(
+              //   quarterTurns: -1,
+              //   child:
+              //    ListWheelScrollView(
+              //     controller: controller.scrollController,
+              //     itemExtent: 100,
+              //     perspective: 0.0001,
+              //     physics: const BouncingScrollPhysics(),
+              //     // onSelectedItemChanged: (value) {
+              //     //   print("index: is changing :new index $value");
+              //     //   controller.onIndexChange(value);
+              //     // },
+              //     offAxisFraction: -0.5,
+              //     children: controller.tabs.asMap().entries.map((entry) {
+              //       final index = entry.key;
+              //       final tab = entry.value;
+              //       return GestureDetector(
+              //         onTap: () => controller.onTabPressed(index),
+              //         child: RotatedBox(
+              //           quarterTurns: 1,
+              //           child: Container(
+              //             width: 50,
+              //             alignment: Alignment.center,
+              //             child: Obx(
+              //               () => AnimatedScale(
+              //                 duration: const Duration(milliseconds: 300),
+              //                 scale: controller.currentIndex.value == index
+              //                     ? 1.4
+              //                     : 1,
+              //                 child: Text(
+              //                   tab,
+              //                   style: AppFonts.openSans(
+              //                       fontSize: AppFontSizes.size12,
+              //                       color:
+              //                           controller.currentIndex.value == index
+              //                               ? AppColors.primaryDark
+              //                               : AppColors.samsungIconGrey),
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       );
+              //     }).toList(),
+              //   ),
+              // )
+              // TabBar(
+              //   isScrollable: true,
+              //   physics: const BouncingScrollPhysics(),
+              //   controller: controller.tabController,
+              //   dividerHeight: 0,
+              //   unselectedLabelColor: Colors.white.withOpacity(0.3),
+              //   onTap: (value) {
+              //     controller.currentIndex.value = value;
+              //   },
+              //   labelPadding: EdgeInsets.symmetric(horizontal: AppSpacings.w15),
+              //   tabs: controller.tabs.asMap().entries.map((entry) {
+              //     final index = entry.key;
+              //     final tab = entry.value;
+              //     return Tab(
+              //       child: Obx(
+              //         () => AnimatedScale(
+              //           duration: const Duration(milliseconds: 300),
+              //           scale: controller.currentIndex.value == index ? 1.4 : 1,
+              //           child: Text(
+              //             tab,
+              //             style: AppFonts.openSans(
+              //                 fontSize: AppFontSizes.size12,
+              //                 color: controller.currentIndex.value == index
+              //                     ? AppColors.primaryDark
+              //                     : AppColors.samsungIconGrey),
+              //           ),
+              //         ),
+              //       ),
+              //     );
+              //   }).toList(),
+              //   splashFactory: NoSplash.splashFactory,
+              //   indicatorColor: Colors.transparent,
+              // ),
+              ),
         ),
       ),
-      body: const Center(
-        child: Text("Hello World"),
-      ),
+      body: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.primaryWhite,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          child: TabBarView(
+            controller: controller.tabController,
+            children: controller.tabs.asMap().entries.map((entry) {
+              final index = entry.key;
+              final tab = entry.value;
+              return Center(
+                child: Text(
+                  tab,
+                  style: AppFonts.openSans(
+                    fontSize: AppFontSizes.size20,
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+              );
+            }).toList(),
+          )),
     );
   }
 }
