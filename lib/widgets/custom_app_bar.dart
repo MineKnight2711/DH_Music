@@ -14,6 +14,7 @@ class CustomAppBar extends GetView<MainScreenController> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: AppColors.secondaryWhite,
       toolbarHeight: AppSpacings.h30 * 3,
       titleSpacing: 0,
       automaticallyImplyLeading: false,
@@ -55,10 +56,11 @@ class CustomAppBar extends GetView<MainScreenController> {
       bottom: PreferredSize(
         preferredSize: const Size(200, 40),
         child: SizedBox(
-            height: 40,
+            height: 60,
             width: AppSpacings.sw(1),
             child: Swiper(
               controller: controller.swiperController,
+              index: controller.currentIndex.value,
               scrollDirection: Axis.horizontal,
               itemCount: controller.tabs.length,
               scale: 0.7,
@@ -71,7 +73,6 @@ class CustomAppBar extends GetView<MainScreenController> {
               itemBuilder: (context, index) {
                 return Container(
                   alignment: Alignment.center,
-                  width: 200,
                   height: 20,
                   child: Obx(
                     () => AnimatedScale(

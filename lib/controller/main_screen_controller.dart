@@ -7,14 +7,15 @@ class MainScreenController extends GetxController
   late TabController tabController;
 
   late SwiperController swiperController;
-  final currentIndex = 3.obs;
+  final currentIndex = 2.obs;
 
   final tabs = const [
     "Spotify",
-    "D.sách phát",
-    "Album",
     "Yêu thích",
-    "Nhạc",
+    "D.sách phát",
+    "Bài hát",
+    "Album",
+    "Nghệ sĩ",
     "Thư mục"
   ];
 
