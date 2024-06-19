@@ -19,8 +19,9 @@ class MainScreen extends GetView<MainScreenController> {
             borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
         child: TabBarView(
           controller: controller.tabController,
-          children: const [
+          children: [
             Center(child: Text("Spotify")),
+            // CounterWidget(),
             Center(child: LoveListView()),
             Center(child: Text("Danh sách phát")),
             Center(child: Text("Bài hát")),
