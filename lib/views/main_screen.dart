@@ -25,8 +25,9 @@ class MainScreen extends GetView<MainScreenController> {
         ),
         child: TabBarView(
           controller: controller.tabController,
-          children: const [
+          children: [
             Center(child: Text("Spotify")),
+            // CounterWidget(),
             Center(child: LoveListView()),
             PlaylistView(),
             Center(child: Text("Bài hát")),
