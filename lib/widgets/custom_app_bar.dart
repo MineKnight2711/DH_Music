@@ -63,27 +63,23 @@ class CustomAppBar extends GetView<MainScreenController> {
               index: controller.currentIndex.value,
               scrollDirection: Axis.horizontal,
               itemCount: controller.tabs.length,
-              scale: 0.7,
-              viewportFraction: 0.24,
+              scale: 1,
+              viewportFraction: 0.25,
               fade: 0.7,
               loop: false,
               onIndexChanged: controller.onTabPressed,
               onTap: controller.swiperController.move,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                return Container(
-                  alignment: Alignment.center,
-                  height: 20,
+                return Center(
                   child: Obx(
                     () => AnimatedScale(
                       duration: const Duration(milliseconds: 200),
-                      scale: controller.currentIndex.value == index ? 1.4 : 1.1,
+                      scale: controller.currentIndex.value == index ? 1.3 : 1.1,
                       child: Text(
                         controller.tabs[index],
                         style: AppFonts.openSans(
-                          fontSize: controller.currentIndex.value == index
-                              ? AppFontSizes.size14
-                              : AppFontSizes.size12,
+                          fontSize: AppFontSizes.size12,
                           color: controller.currentIndex.value == index
                               ? AppColors.primaryDark
                               : AppColors.samsungIconGrey,

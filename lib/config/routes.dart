@@ -10,7 +10,7 @@ class AppRoutes {
       name: home,
       page: () => const MainScreen(),
       transition: Transition.noTransition,
-      binding: MainScreenBindings(),
+      binding: AppBindings(),
     ),
   ];
 }

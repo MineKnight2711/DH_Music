@@ -1,7 +1,5 @@
 import 'package:dh_music/config/config_ex.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class LoveListView extends StatelessWidget {
   const LoveListView({super.key});
