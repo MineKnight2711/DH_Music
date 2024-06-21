@@ -1,4 +1,5 @@
 import 'package:dh_music/config/config_ex.dart';
+import 'package:dh_music/config/routes.dart';
 import 'package:dh_music/config/spacings.dart';
 import 'package:dh_music/controller/file_path_controller.dart';
 import 'package:dh_music/widgets/popop_menu_sort_button.dart';
@@ -13,7 +14,10 @@ class FilePathView extends GetView<FilePathController> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-          top: AppSpacings.h10, left: AppSpacings.w15, right: AppSpacings.w15),
+        top: AppSpacings.h10,
+        left: AppSpacings.w15,
+        right: AppSpacings.w15,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -35,53 +39,61 @@ class FilePathView extends GetView<FilePathController> {
                 child: ListView.separated(
                   itemBuilder: (context, index) {
                     final path = controller.directoryToFileNames[index];
-                    print(path.filePaths);
-                    return Row(
-                      children: [
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: SvgPicture.asset(
-                                "assets/svg/samsung_music.svg",
-                                width: 60,
-                              ),
-                            ),
-                            const Positioned(
-                              bottom: 3,
-                              right: 3,
-                              child: Icon(
-                                Icons.folder_outlined,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: AppSpacings.w10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    final pathTitle = path.directoryPath.split("/").last;
+                    return InkWell(
+                      onTap: () {
+                        AppRoutes.navigateWithArguments(
+                          route: AppRoutes.musicPathList,
+                          arguments: path,
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Stack(
                             children: [
-                              Text(
-                                path.directoryPath.split("/").last,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SvgPicture.asset(
+                                  "assets/svg/samsung_music.svg",
+                                  width: 60,
                                 ),
                               ),
-                              Text(
-                                path.directoryPath.replaceFirst(
-                                    "/storage/emulated/0", "/Bộ nhớ trong"),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
+                              const Positioned(
+                                bottom: 3,
+                                right: 3,
+                                child: Icon(
+                                  Icons.folder_outlined,
+                                  size: 15,
+                                  color: Colors.white,
                                 ),
-                              ),
+                              )
                             ],
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: EdgeInsets.only(left: AppSpacings.w10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  pathTitle,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  path.directoryPath.replaceFirst(
+                                      "/storage/emulated/0", "/Bộ nhớ trong"),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   },
                   separatorBuilder: (context, index) => Divider(

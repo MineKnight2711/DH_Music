@@ -12,7 +12,6 @@ class MusicPaths {
 }
 
 class FilePathController extends GetxController {
-  final RxList<String> songsPath = <String>[].obs;
   final RxList<MusicPaths> directoryToFileNames = <MusicPaths>[].obs;
   @override
   void onInit() {
@@ -59,8 +58,8 @@ class FilePathController extends GetxController {
         }
       },
       onDone: () {
-        Logger.info(
-            runtimeType, 'getAllPath Songs list count: ${songsPath.length}');
+        Logger.info(runtimeType,
+            'getAllPath Songs list count: ${directoryToFileNames.length}');
       },
       onError: (e) {
         // Handle the error
