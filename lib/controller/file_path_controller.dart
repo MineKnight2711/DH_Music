@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dh_music/utils/logging.dart';
 import 'package:get/get.dart';
+// ignore: unused_import
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MusicPaths {
@@ -16,22 +18,22 @@ class FilePathController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    requestPermission();
+    getDevicePath();
   }
 
-  void requestPermission() async {
+  void getDevicePath() async {
     final status = await Permission.audio.status;
     if (status.isGranted) {
       Logger.info(runtimeType, 'Storage Permission is granted');
-      getAllPath();
+      _getAllMp3File();
     } else {
       Logger.info(runtimeType, 'Storage Permission is denied');
       await Permission.audio.request();
     }
   }
 
-  void getAllPath() async {
-    Directory dir = Directory('/storage/emulated/0/');
+  void _getAllMp3File() async {
+    Directory dir = Directory("/storage/emulated/0/");
 
     Stream<FileSystemEntity> files =
         dir.list(recursive: true, followLinks: false);
@@ -62,8 +64,7 @@ class FilePathController extends GetxController {
             'getAllPath Songs list count: ${directoryToFileNames.length}');
       },
       onError: (e) {
-        // Handle the error
-        // Logger.error(runtimeType, "Cannot access this directory: $e");
+        Logger.error(runtimeType, "Cannot access this directory: $e");
       },
     );
   }
