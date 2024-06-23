@@ -9,8 +9,9 @@ import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import '../../../utils/custom_bean.dart';
 
-class MusicPathListView extends StatelessWidget {
+class MusicPathListView extends GetView<FilePathController> {
   final ItemScrollController itemScrollController = ItemScrollController();
   MusicPathListView({super.key});
 
@@ -118,79 +119,86 @@ class MusicPathListView extends StatelessWidget {
                         builder: (context, snapshot) {
                           final metadata = snapshot.data;
                           if (snapshot.hasData) {
-                            return Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: metadata?.albumArt != null
-                                      ? Image.memory(
-                                          metadata!.albumArt!,
-                                          width: 60,
-                                        )
-                                      : SvgPicture.asset(
-                                          "assets/svg/samsung_music.svg",
-                                          width: 60,
-                                        ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: AppSpacings.w10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            width: AppSpacings.sw(0.6),
-                                            child: Text(
-                                              metadata?.trackName ?? song,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
+                            return GestureDetector(
+                              onTap: () {
+                                controller.playMusic(
+                                    "${musicPaths.directoryPath}/$song");
+                              },
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: metadata?.albumArt != null
+                                        ? Image.memory(
+                                            metadata!.albumArt!,
+                                            width: 60,
+                                          )
+                                        : SvgPicture.asset(
+                                            "assets/svg/samsung_music.svg",
+                                            width: 60,
+                                          ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: AppSpacings.w10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              width: AppSpacings.sw(0.6),
+                                              child: Text(
+                                                metadata?.trackName ?? song,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          metadata?.trackArtistNames != null
-                                              ? Row(
-                                                  children: metadata!
-                                                      .trackArtistNames!
-                                                      .map(
-                                                        (e) => Text(
-                                                          e,
-                                                          style:
-                                                              AppFonts.openSans(
-                                                            fontSize:
-                                                                AppFontSizes
-                                                                    .size14,
-                                                            color: Colors.grey,
+                                            metadata?.trackArtistNames != null
+                                                ? Row(
+                                                    children: metadata!
+                                                        .trackArtistNames!
+                                                        .map(
+                                                          (e) => Text(
+                                                            e,
+                                                            style: AppFonts
+                                                                .openSans(
+                                                              fontSize:
+                                                                  AppFontSizes
+                                                                      .size14,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      )
-                                                      .toList(),
-                                                )
-                                              : Text(
-                                                  "Không có",
-                                                  style: AppFonts.openSans(
-                                                    fontSize:
-                                                        AppFontSizes.size14,
-                                                    color: Colors.grey,
+                                                        )
+                                                        .toList(),
+                                                  )
+                                                : Text(
+                                                    "Không có",
+                                                    style: AppFonts.openSans(
+                                                      fontSize:
+                                                          AppFontSizes.size14,
+                                                      color: Colors.grey,
+                                                    ),
                                                   ),
-                                                ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    IconButton(
-                                      iconSize: 20,
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.more_vert),
-                                    )
-                                  ],
-                                ),
-                              ],
+                                      IconButton(
+                                        iconSize: 20,
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.more_vert),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
                             );
                           } else if (snapshot.hasError) {
                             return Text(
@@ -257,16 +265,4 @@ class MusicPathListView extends StatelessWidget {
       ),
     );
   }
-}
-
-class MyBean implements ISuspensionBean {
-  final String name;
-
-  MyBean({required this.name}) : isShowSuspension = false;
-
-  @override
-  String getSuspensionTag() => name[0];
-
-  @override
-  bool isShowSuspension;
 }

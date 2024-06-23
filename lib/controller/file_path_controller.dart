@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dh_music/utils/logging.dart';
 import 'package:get/get.dart';
 // ignore: unused_import
@@ -14,6 +15,9 @@ class MusicPaths {
 }
 
 class FilePathController extends GetxController {
+  final player = AudioPlayer();
+  final RxList<String> allMusic = <String>[].obs;
+
   final RxList<MusicPaths> directoryToFileNames = <MusicPaths>[].obs;
   @override
   void onInit() {
@@ -48,7 +52,9 @@ class FilePathController extends GetxController {
 
           final fileName = path.substring(path.lastIndexOf('/') + 1);
           Logger.info(runtimeType, 'getAllPath fileName: $fileName');
-
+          allMusic.add("$directory/$fileName");
+          Logger.info(
+              runtimeType, 'getAllPath allMusic count: ${allMusic.length}');
           final uniquePaths = directoryToFileNames
               .where((element) => element.directoryPath == directory);
           if (uniquePaths.isEmpty) {
@@ -67,5 +73,14 @@ class FilePathController extends GetxController {
         Logger.error(runtimeType, "Cannot access this directory: $e");
       },
     );
+  }
+
+  void playMusic(String path) async {
+    Logger.info(runtimeType, 'playMusic path: $path');
+    try {
+      await player.play(DeviceFileSource(path));
+    } catch (e) {
+      Logger.error(runtimeType, 'playMusic error: $e');
+    }
   }
 }
