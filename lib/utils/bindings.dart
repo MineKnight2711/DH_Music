@@ -6,7 +6,7 @@ import '../controller/main_screen_controller.dart';
 class AppBindings extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => MainScreenController());
-    Get.lazyPut(() => FilePathController());
+    Get.put(MainScreenController());
+    Get.put(FilePathController());
   }
 }
