@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -23,6 +24,8 @@ class FilePathController extends GetxController {
   final RxList<MusicPaths> directoryToFileNames = <MusicPaths>[].obs;
 
   final Rx<PlayerState> playerState = PlayerState.stopped.obs;
+
+  final Rx<Queue<String>> musicQueue = Queue<String>().obs;
   final RxString currentPath = "".obs;
   @override
   void onInit() {
@@ -81,22 +84,40 @@ class FilePathController extends GetxController {
     );
   }
 
+  void addToQueue(String musicPath) {
+    musicQueue.value.add(musicPath);
+  }
+
   void playMusic(String path) async {
     Logger.info(runtimeType, 'playMusic path: $path');
-    currentPath.value = path;
-    try {
-      if (playerState.value == PlayerState.playing) {
-        playerState.value = PlayerState.paused;
-        await player.pause();
-      } else if (playerState.value == PlayerState.paused) {
-        playerState.value = PlayerState.playing;
-        await player.resume();
-      } else {
-        playerState.value = PlayerState.playing;
-        await player.play(DeviceFileSource(path));
+
+    if (path != currentPath.value) {
+      currentPath.value = path;
+      Logger.info(runtimeType, 'playMusic change song: ${currentPath.value}');
+      try {
+        player.stop().then(
+          (value) {
+            player.play(DeviceFileSource(path));
+          },
+        );
+      } catch (e) {
+        Logger.error(runtimeType, 'playMusic error: $e');
       }
-    } catch (e) {
-      Logger.error(runtimeType, 'playMusic error: $e');
+    } else {
+      try {
+        if (playerState.value == PlayerState.playing) {
+          playerState.value = PlayerState.paused;
+          await player.pause();
+        } else if (playerState.value == PlayerState.paused) {
+          playerState.value = PlayerState.playing;
+          await player.resume();
+        } else {
+          playerState.value = PlayerState.playing;
+          await player.play(DeviceFileSource(path));
+        }
+      } catch (e) {
+        Logger.error(runtimeType, 'playMusic error: $e');
+      }
     }
   }
 

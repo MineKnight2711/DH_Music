@@ -57,7 +57,9 @@ class SongPlayerWidget extends GetView<FilePathController> {
     return SizedBox(
       height: AppSpacings.ch(43),
       child: FloatingActionButton(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
         backgroundColor: const Color(0xfffe8508),
         onPressed: () {},
         child: Container(
