@@ -95,8 +95,10 @@ class FilePathController extends GetxController {
       currentPath.value = path;
       Logger.info(runtimeType, 'playMusic change song: ${currentPath.value}');
       try {
+        playerState.value = PlayerState.stopped;
         player.stop().then(
           (value) {
+            playerState.value = PlayerState.playing;
             player.play(DeviceFileSource(path));
           },
         );
