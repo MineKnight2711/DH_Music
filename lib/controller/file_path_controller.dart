@@ -14,11 +14,16 @@ class MusicPaths {
   MusicPaths({required this.directoryPath, required this.filePaths});
 }
 
+enum PlayerState { stopped, playing, paused }
+
 class FilePathController extends GetxController {
   final player = AudioPlayer();
-  final RxList<String> allMusic = <String>[].obs;
+  final RxList<MusicPaths> allMusic = <MusicPaths>[].obs;
 
   final RxList<MusicPaths> directoryToFileNames = <MusicPaths>[].obs;
+
+  final Rx<PlayerState> playerState = PlayerState.stopped.obs;
+  final RxString currentPath = "".obs;
   @override
   void onInit() {
     super.onInit();
@@ -47,12 +52,13 @@ class FilePathController extends GetxController {
         if (path.contains('/Android/')) {
           return;
         } else if (path.endsWith('.mp3')) {
+          Logger.info(runtimeType, 'getAllPath  : $path');
           final directory = path.substring(0, path.lastIndexOf('/'));
           Logger.info(runtimeType, 'getAllPath directory: $directory');
 
           final fileName = path.substring(path.lastIndexOf('/') + 1);
           Logger.info(runtimeType, 'getAllPath fileName: $fileName');
-          allMusic.add("$directory/$fileName");
+          allMusic.add(MusicPaths(directoryPath: path, filePaths: []));
           Logger.info(
               runtimeType, 'getAllPath allMusic count: ${allMusic.length}');
           final uniquePaths = directoryToFileNames
@@ -77,10 +83,28 @@ class FilePathController extends GetxController {
 
   void playMusic(String path) async {
     Logger.info(runtimeType, 'playMusic path: $path');
+    currentPath.value = path;
     try {
-      await player.play(DeviceFileSource(path));
+      if (playerState.value == PlayerState.playing) {
+        playerState.value = PlayerState.paused;
+        await player.pause();
+      } else if (playerState.value == PlayerState.paused) {
+        playerState.value = PlayerState.playing;
+        await player.resume();
+      } else {
+        playerState.value = PlayerState.playing;
+        await player.play(DeviceFileSource(path));
+      }
     } catch (e) {
       Logger.error(runtimeType, 'playMusic error: $e');
+    }
+  }
+
+  void stopMusic() async {
+    try {
+      await player.pause();
+    } catch (e) {
+      Logger.error(runtimeType, 'pause error: $e');
     }
   }
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
 import 'package:dh_music/controller/file_path_controller.dart';
+import 'package:dh_music/utils/logging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_media_metadata/flutter_media_metadata.dart';
@@ -20,6 +21,7 @@ class AllSongsViews extends GetView<FilePathController> {
 
   @override
   Widget build(BuildContext context) {
+    Logger.info(runtimeType, 'Songs builder: ${controller.allMusic.length}');
     return Stack(
       children: [
         Container(
@@ -73,63 +75,95 @@ class AllSongsViews extends GetView<FilePathController> {
                 ],
               ),
               SizedBox(height: AppSpacings.h10),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: controller.allMusic.length,
-                  separatorBuilder: (context, index) => Divider(
-                    indent: AppSpacings.w30 * 2.3,
-                  ),
-                  itemBuilder: (context, index) {
-                    final song = controller.allMusic[index];
-
-                    return FutureBuilder(
-                      future: MetadataRetriever.fromFile(File(song)),
-                      builder: (context, snapshot) {
-                        final metadata = snapshot.data;
-                        if (snapshot.hasData) {
-                          return Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: metadata?.albumArt != null
-                                    ? Image.memory(
-                                        metadata!.albumArt!,
-                                        width: 60,
-                                      )
-                                    : SvgPicture.asset(
-                                        "assets/svg/samsung_music.svg",
-                                        width: 60,
+              Obx(
+                () {
+                  if (controller.allMusic.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return Expanded(
+                      child: ListView.separated(
+                        itemCount: controller.allMusic.length,
+                        separatorBuilder: (context, index) => Divider(
+                          indent: AppSpacings.w30 * 2.3,
+                        ),
+                        itemBuilder: (context, index) {
+                          final song = controller.allMusic[index];
+                          Logger.info(runtimeType,
+                              'Songs builder: ${controller.allMusic.length}');
+                          return FutureBuilder(
+                            future: MetadataRetriever.fromFile(
+                                File(song.directoryPath)),
+                            builder: (context, snapshot) {
+                              final metadata = snapshot.data;
+                              if (snapshot.hasData) {
+                                return InkWell(
+                                  onTap: () =>
+                                      controller.playMusic(song.directoryPath),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: metadata?.albumArt != null
+                                            ? Image.memory(
+                                                metadata!.albumArt!,
+                                                width: 60,
+                                              )
+                                            : SvgPicture.asset(
+                                                "assets/svg/samsung_music.svg",
+                                                width: 60,
+                                              ),
                                       ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(left: AppSpacings.w10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: AppSpacings.sw(0.6),
-                                          child: Text(
-                                            metadata?.trackName ?? song,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                        metadata?.trackArtistNames != null
-                                            ? Row(
-                                                children: metadata!
-                                                    .trackArtistNames!
-                                                    .map(
-                                                      (e) => Text(
-                                                        e,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: AppSpacings.w10),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: AppSpacings.sw(0.55),
+                                                  child: Text(
+                                                    metadata?.trackName ??
+                                                        song.directoryPath
+                                                            .split("/")
+                                                            .last,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                                metadata?.trackArtistNames !=
+                                                        null
+                                                    ? Row(
+                                                        children: metadata!
+                                                            .trackArtistNames!
+                                                            .map(
+                                                              (e) => Text(
+                                                                e,
+                                                                style: AppFonts
+                                                                    .openSans(
+                                                                  fontSize:
+                                                                      AppFontSizes
+                                                                          .size14,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                      )
+                                                    : Text(
+                                                        "Không có",
                                                         style:
                                                             AppFonts.openSans(
                                                           fontSize: AppFontSizes
@@ -137,45 +171,39 @@ class AllSongsViews extends GetView<FilePathController> {
                                                           color: Colors.grey,
                                                         ),
                                                       ),
-                                                    )
-                                                    .toList(),
-                                              )
-                                            : Text(
-                                                "Không có",
-                                                style: AppFonts.openSans(
-                                                  fontSize: AppFontSizes.size14,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                      ],
-                                    ),
+                                              ],
+                                            ),
+                                          ),
+                                          IconButton(
+                                            iconSize: 20,
+                                            onPressed: () {},
+                                            icon: const Icon(Icons.more_vert),
+                                          )
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    iconSize: 20,
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.more_vert),
-                                  )
-                                ],
-                              ),
-                            ],
+                                );
+                              } else if (snapshot.hasError) {
+                                return Text(
+                                  snapshot.error.toString(),
+                                  style: AppFonts.openSans(
+                                    fontSize: AppFontSizes.size16,
+                                  ),
+                                );
+                              } else {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                            },
                           );
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            snapshot.error.toString(),
-                            style: AppFonts.openSans(
-                              fontSize: AppFontSizes.size16,
-                            ),
-                          );
-                        } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
+                        },
+                      ),
                     );
-                  },
-                ),
-              ),
+                  }
+                },
+              )
             ],
           ),
         ),
@@ -184,17 +212,18 @@ class AllSongsViews extends GetView<FilePathController> {
           top: 50,
           child: Container(
             width: 25,
-            height: AppSpacings.ch(500),
+            height: AppSpacings.ch(450),
             decoration: BoxDecoration(
               color: const Color(0xffe9e9eb),
               borderRadius: BorderRadius.circular(20),
             ),
             child: AzListView(
               data: controller.allMusic
-                  .map((item) => MyBean(name: item))
+                  .map((item) =>
+                      MyBean(name: item.directoryPath.split("/").last))
                   .toList(),
               itemCount: controller.allMusic.length,
-              indexBarItemHeight: AppSpacings.h15 * 1.2,
+              indexBarItemHeight: AppSpacings.h15 * 1.1,
               itemScrollController: itemScrollController,
               indexHintBuilder: (context, tag) {
                 return Padding(

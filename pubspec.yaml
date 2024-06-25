@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  
   audioplayers: ^6.0.0
   azlistview: ^2.0.0
   card_swiper: ^3.0.1

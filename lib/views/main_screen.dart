@@ -1,6 +1,8 @@
-import 'package:dh_music/config/fonts.dart';
+import 'package:dh_music/config/config_ex.dart';
+import 'package:dh_music/controller/file_path_controller.dart';
 import 'package:dh_music/views/main_love_list_views.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:text_marquee/text_marquee.dart';
 import '../controller/main_screen_controller.dart';
@@ -40,22 +42,40 @@ class MainScreen extends GetView<MainScreenController> {
           ],
         ),
       ),
-      bottomNavigationBar: FloatingActionButton(
+      bottomNavigationBar: const SongPlayerWidget(),
+    );
+  }
+}
+
+class SongPlayerWidget extends GetView<FilePathController> {
+  const SongPlayerWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: AppSpacings.ch(43),
+      child: FloatingActionButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         backgroundColor: const Color(0xfffe8508),
         onPressed: () {},
-        child: Padding(
+        child: Container(
+          width: AppSpacings.sw(1),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage:
-                    Image.asset("assets/images/love_list.jpg").image,
+              SizedBox(
+                width: AppSpacings.sw(0.12),
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundImage:
+                      Image.asset("assets/images/love_list.jpg").image,
+                ),
               ),
-              Container(
-                width: 120,
-                margin: const EdgeInsets.symmetric(horizontal: 5),
+              SizedBox(
+                width: AppSpacings.sw(0.35),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -65,7 +85,7 @@ class MainScreen extends GetView<MainScreenController> {
                       rtl: true,
                       duration: const Duration(milliseconds: 10000),
                       style: AppFonts.openSans(
-                        fontSize: AppFontSizes.customSize(13),
+                        fontSize: AppFontSizes.size14,
                         color: Colors.white,
                       ),
                     ),
@@ -81,26 +101,80 @@ class MainScreen extends GetView<MainScreenController> {
               ),
               Row(
                 children: [
-                  IconButton(
-                    // padding: EdgeInsets.symmetric(horizontal: 5),
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.skip_previous_sharp,
-                      color: Colors.white,
+                  InkWell(
+                    borderRadius: BorderRadius.circular(50),
+                    onTap: () {},
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.transparent,
+                      child: SvgPicture.asset(
+                        "assets/svg/previous_song.svg",
+                        width: AppSpacings.w20,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.play_arrow, color: Colors.white),
+                  Obx(
+                    () => InkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: controller.currentPath.isNotEmpty
+                          ? () {
+                              controller
+                                  .playMusic(controller.currentPath.value);
+                            }
+                          : () {},
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.transparent,
+                        child: SvgPicture.asset(
+                          controller.playerState.value == PlayerState.playing &&
+                                  controller.playerState.value !=
+                                      PlayerState.stopped
+                              ? "assets/svg/pause_song.svg"
+                              : "assets/svg/play_song.svg",
+                          width: AppSpacings.w25,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon:
-                        const Icon(Icons.skip_next_sharp, color: Colors.white),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(50),
+                    onTap: () {},
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.transparent,
+                      child: SvgPicture.asset(
+                        "assets/svg/next_song.svg",
+                        width: AppSpacings.w20,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.queue_music, color: Colors.white),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(50),
+                    onTap: () {},
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.transparent,
+                      child: SvgPicture.asset(
+                        "assets/svg/music_list.svg",
+                        width: AppSpacings.w20,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               )

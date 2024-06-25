@@ -9,18 +9,20 @@ class PlaylistView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        PopUpMenuSortButton(
-          options: [
-            "Thứ tự t.chỉnh",
-            "Tên",
-            "Ngày thêm",
-            "Ngày đã phát",
-          ],
-        ),
-      ],
+    return const SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PopUpMenuSortButton(
+            options: [
+              "Thứ tự t.chỉnh",
+              "Tên",
+              "Ngày thêm",
+              "Ngày đã phát",
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
