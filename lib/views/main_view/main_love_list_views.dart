@@ -54,11 +54,12 @@ class LoveListView extends StatelessWidget {
             SizedBox(
               height: 150,
               child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  children: listFavortieType
-                      .map((song) => TopMusicWidget())
-                      .toList()),
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                children: listFavortieType
+                    .map((song) => const TopMusicWidget())
+                    .toList(),
+              ),
             ),
           ],
         ),

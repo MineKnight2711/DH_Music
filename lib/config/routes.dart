@@ -1,10 +1,12 @@
 import 'package:dh_music/utils/bindings.dart';
 import 'package:dh_music/views/file_path/path_music_list/path_music_list_view.dart';
-import 'package:dh_music/views/main_screen.dart';
+import 'package:dh_music/views/main_view/main_screen.dart';
+import 'package:dh_music/views/queue/queue_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
   static const String home = '/home';
+  static const String queue = '/queue';
   static const String musicPathList = '/musicPathList';
 
   static final List<GetPage> getPages = [
@@ -15,15 +17,19 @@ class AppRoutes {
       binding: AppBindings(),
     ),
     GetPage(
+      name: queue,
+      page: () => const QueueScreen(),
+      transition: Transition.downToUp,
+    ),
+    GetPage(
       name: musicPathList,
       page: () => MusicPathListView(),
       transition: Transition.noTransition,
-      binding: AppBindings(),
     ),
   ];
 
   static void navigateTo({required String route}) {
-    Get.toNamed(musicPathList);
+    Get.toNamed(route);
   }
 
   static navigateWithArguments({

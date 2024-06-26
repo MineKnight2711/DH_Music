@@ -121,7 +121,7 @@ class MusicPathListView extends GetView<FilePathController> {
                           if (snapshot.hasData) {
                             return GestureDetector(
                               onTap: () {
-                                controller.playMusic(
+                                controller.startMusic(
                                     "${musicPaths.directoryPath}/$song");
                               },
                               child: Row(
@@ -150,7 +150,7 @@ class MusicPathListView extends GetView<FilePathController> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             SizedBox(
-                                              width: AppSpacings.sw(0.6),
+                                              width: AppSpacings.sw(0.55),
                                               child: Text(
                                                 metadata?.trackName ?? song,
                                                 overflow: TextOverflow.ellipsis,

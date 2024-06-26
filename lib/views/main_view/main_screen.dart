@@ -1,15 +1,16 @@
 import 'package:dh_music/config/config_ex.dart';
+import 'package:dh_music/config/routes.dart';
 import 'package:dh_music/controller/file_path_controller.dart';
-import 'package:dh_music/views/main_love_list_views.dart';
+import 'package:dh_music/views/main_view/main_love_list_views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:text_marquee/text_marquee.dart';
-import '../controller/main_screen_controller.dart';
-import '../widgets/custom_app_bar.dart';
-import 'all_songs/all_songs_view.dart';
-import 'file_path/file_path_view.dart';
-import 'playlist/playlist_view.dart';
+import '../../controller/main_screen_controller.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../all_songs/all_songs_view.dart';
+import '../file_path/file_path_view.dart';
+import '../playlist/playlist_view.dart';
 
 class MainScreen extends GetView<MainScreenController> {
   const MainScreen({super.key});
@@ -124,8 +125,7 @@ class SongPlayerWidget extends GetView<FilePathController> {
                       borderRadius: BorderRadius.circular(50),
                       onTap: controller.currentPath.isNotEmpty
                           ? () {
-                              controller
-                                  .playMusic(controller.currentPath.value);
+                              controller.playOrPause();
                             }
                           : () {},
                       child: CircleAvatar(
@@ -164,7 +164,7 @@ class SongPlayerWidget extends GetView<FilePathController> {
                   ),
                   InkWell(
                     borderRadius: BorderRadius.circular(50),
-                    onTap: () {},
+                    onTap: () => AppRoutes.navigateTo(route: AppRoutes.queue),
                     child: CircleAvatar(
                       radius: 20,
                       backgroundColor: Colors.transparent,

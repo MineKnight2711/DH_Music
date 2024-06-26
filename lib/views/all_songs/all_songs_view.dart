@@ -100,7 +100,7 @@ class AllSongsViews extends GetView<FilePathController> {
                               if (snapshot.hasData) {
                                 return InkWell(
                                   onTap: () =>
-                                      controller.playMusic(song.directoryPath),
+                                      controller.startMusic(song.directoryPath),
                                   child: Row(
                                     children: [
                                       ClipRRect(

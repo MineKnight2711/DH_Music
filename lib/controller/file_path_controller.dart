@@ -1,7 +1,7 @@
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dh_music/utils/logging.dart';
 import 'package:get/get.dart';
 // ignore: unused_import
@@ -25,22 +25,45 @@ class FilePathController extends GetxController {
 
   final Rx<PlayerState> playerState = PlayerState.stopped.obs;
 
-  final Rx<Queue<String>> musicQueue = Queue<String>().obs;
+  final RxList<String> musicQueue = <String>[].obs;
+
   final RxString currentPath = "".obs;
   @override
   void onInit() {
     super.onInit();
-    getDevicePath();
+    requestPermissionThenGetAllMp3Path();
   }
 
-  void getDevicePath() async {
-    final status = await Permission.audio.status;
-    if (status.isGranted) {
-      Logger.info(runtimeType, 'Storage Permission is granted');
-      _getAllMp3File();
-    } else {
-      Logger.info(runtimeType, 'Storage Permission is denied');
-      await Permission.audio.request();
+  void requestPermissionThenGetAllMp3Path() async {
+    //Before using DeviceInfoPlugin make sure to re-build the app
+    final operationSystemVersion = await DeviceInfoPlugin().androidInfo;
+    final int sdkVersion = operationSystemVersion.version.sdkInt;
+    if (sdkVersion > 30) {
+      final status = await Permission.audio.status;
+      Logger.info(runtimeType,
+          'Operating System Version: ${operationSystemVersion.version.sdkInt}');
+      if (status.isGranted) {
+        Logger.info(
+            runtimeType, 'requestPermission Audio Permission is granted');
+        _getAllMp3File();
+      } else {
+        Logger.info(
+            runtimeType, 'requestPermission Audio Permission is denied');
+        await Permission.audio.request();
+      }
+    } else if (sdkVersion == 30) {
+      final status = await Permission.storage.status;
+      Logger.info(runtimeType,
+          'Operating System Version: ${operationSystemVersion.version.sdkInt}');
+      if (status.isGranted) {
+        Logger.info(
+            runtimeType, 'requestPermission Storage Permission is granted');
+        _getAllMp3File();
+      } else {
+        Logger.info(
+            runtimeType, 'requestPermission Storage Permission is denied');
+        await Permission.storage.request();
+      }
     }
   }
 
@@ -79,47 +102,39 @@ class FilePathController extends GetxController {
             'getAllPath Songs list count: ${directoryToFileNames.length}');
       },
       onError: (e) {
-        Logger.error(runtimeType, "Cannot access this directory: $e");
+        Logger.error(runtimeType, "getAllPath cannot access directory: $e");
       },
-    );
+    ).onError((e) {
+      Logger.error(runtimeType, "getAllPath cannot access directory: $e");
+    });
   }
 
   void addToQueue(String musicPath) {
-    musicQueue.value.add(musicPath);
+    musicQueue.add(musicPath);
   }
 
-  void playMusic(String path) async {
+  void startMusic(String path) async {
     Logger.info(runtimeType, 'playMusic path: $path');
 
-    if (path != currentPath.value) {
-      currentPath.value = path;
-      Logger.info(runtimeType, 'playMusic change song: ${currentPath.value}');
-      try {
-        playerState.value = PlayerState.stopped;
-        player.stop().then(
-          (value) {
-            playerState.value = PlayerState.playing;
-            player.play(DeviceFileSource(path));
-          },
-        );
-      } catch (e) {
-        Logger.error(runtimeType, 'playMusic error: $e');
-      }
-    } else {
-      try {
-        if (playerState.value == PlayerState.playing) {
-          playerState.value = PlayerState.paused;
-          await player.pause();
-        } else if (playerState.value == PlayerState.paused) {
-          playerState.value = PlayerState.playing;
-          await player.resume();
-        } else {
-          playerState.value = PlayerState.playing;
-          await player.play(DeviceFileSource(path));
-        }
-      } catch (e) {
-        Logger.error(runtimeType, 'playMusic error: $e');
-      }
+    try {
+      player.stop().then(
+        (value) {
+          playerState.value == PlayerState.playing;
+          player.play(DeviceFileSource(path));
+        },
+      );
+    } catch (e) {
+      Logger.error(runtimeType, 'playMusic error: $e');
+    }
+  }
+
+  void playOrPause() {
+    if (playerState.value == PlayerState.playing) {
+      playerState.value = PlayerState.paused;
+      player.pause();
+    } else if (playerState.value == PlayerState.paused) {
+      playerState.value = PlayerState.playing;
+      player.resume();
     }
   }
 

@@ -6,14 +6,16 @@ import '../config/config_ex.dart';
 
 class PopUpMenuSortButton extends StatelessWidget {
   final List<String> options;
+  final String initialSelectedOption;
   const PopUpMenuSortButton({
     super.key,
     required this.options,
+    this.initialSelectedOption = "Tên",
   });
 
   @override
   Widget build(BuildContext context) {
-    final selectedOption = "Tên".obs;
+    final selectedOption = initialSelectedOption.obs;
     return PopupMenuButton<String>(
       elevation: 5,
       splashRadius: 0,
