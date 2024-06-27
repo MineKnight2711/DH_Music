@@ -25,57 +25,61 @@ class QueueMusicListWidget extends GetView<FilePathController> {
           child: ListView(
             children: controller.musicQueue.map(
               (songMetadata) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: SizedBox(
-                          width: AppSpacings.cdg(40),
-                          height: AppSpacings.cdg(40),
-                          child: songMetadata.albumArt != null
-                              ? Image.memory(
-                                  songMetadata.albumArt!,
-                                  fit: BoxFit.cover,
-                                )
-                              : SvgPicture.asset(
-                                  "assets/svg/samsung_music.svg",
-                                  width: 20,
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.transparent,
-                                    BlendMode.srcATop,
+                return InkWell(
+                  onTap: () =>
+                      controller.startMusic(songMetadata.filePath ?? ""),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: SizedBox(
+                            width: AppSpacings.cdg(40),
+                            height: AppSpacings.cdg(40),
+                            child: songMetadata.albumArt != null
+                                ? Image.memory(
+                                    songMetadata.albumArt!,
+                                    fit: BoxFit.cover,
+                                  )
+                                : SvgPicture.asset(
+                                    "assets/svg/samsung_music.svg",
+                                    width: 20,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.transparent,
+                                      BlendMode.srcATop,
+                                    ),
+                                    fit: BoxFit.cover,
                                   ),
-                                  fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(
+                          width: AppSpacings.sw(0.7),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                songMetadata.trackName ??
+                                    "${songMetadata.filePath?.split("/").last}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppFonts.openSans(
+                                  fontSize: AppFontSizes.size14,
                                 ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: AppSpacings.sw(0.7),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              songMetadata.trackName ??
-                                  "${songMetadata.filePath?.split("/").last}",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppFonts.openSans(
-                                fontSize: AppFontSizes.size14,
                               ),
-                            ),
-                            Text(
-                              songMetadata.authorName ?? "Không có",
-                              style: AppFonts.openSans(
-                                fontSize: AppFontSizes.size12,
+                              Text(
+                                songMetadata.authorName ?? "Không có",
+                                style: AppFonts.openSans(
+                                  fontSize: AppFontSizes.size12,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const Icon(Icons.more_vert)
-                    ],
+                        const Icon(Icons.more_vert)
+                      ],
+                    ),
                   ),
                 );
               },

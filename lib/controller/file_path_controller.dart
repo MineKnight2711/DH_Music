@@ -25,11 +25,12 @@ class FilePathController extends GetxController {
   final Rx<PlayerState> currentPlayerState = PlayerState.stopped.obs;
 
   final RxList<Metadata> musicQueue = <Metadata>[].obs;
-
+  final Rx<Duration> currentDuration = Rx<Duration>(Duration.zero);
   final Rxn<Metadata> currentSong = Rxn<Metadata>();
   @override
   void onInit() {
     super.onInit();
+
     requestPermissionThenGetAllMp3Path();
     listenToPlayerState();
   }
@@ -111,14 +112,25 @@ class FilePathController extends GetxController {
   }
 
   void listenToPlayerState() {
-    player.onPlayerStateChanged.listen((event) {
-      currentPlayerState.value = event;
+    player.onPlayerStateChanged.listen((state) {
+      currentPlayerState.value = state;
+    });
+    player.onDurationChanged.listen((duration) {
+      Logger.info(runtimeType, 'listenToPlayerState duration: $duration');
+    });
+    player.onPositionChanged.listen((duration) {
+      currentDuration.value = duration;
     });
   }
 
-  // void addToQueue(String musicPath) {
-  //   musicQueue.add(musicPath);
-  // }
+  void seekDuration(Duration duration) {
+    Logger.info(runtimeType, 'seekDuration : $duration');
+    if (currentPlayerState.value == PlayerState.playing) {
+      player.seek(duration);
+
+      currentDuration.value = duration;
+    }
+  }
 
   void startMusic(String path,
       {List<Metadata> addToQueueList = const []}) async {

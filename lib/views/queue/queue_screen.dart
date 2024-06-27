@@ -1,4 +1,5 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dh_music/widgets/popop_menu_sort_button.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -75,40 +76,68 @@ class QueueScreen extends GetView<FilePathController> {
               ],
             ),
             const QueueMusicListWidget(),
-            ProgressBar(
-              progress: Duration(
-                  milliseconds:
-                      controller.currentSong.value?.trackDuration ?? 0),
-              // buffered: Duration(milliseconds: 2000),
-              total: Duration(
-                  milliseconds:
-                      controller.currentSong.value?.trackDuration ?? 0),
-              onSeek: (duration) {
-                print('User selected a new time: $duration');
-              },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              child: Obx(
+                () => ProgressBar(
+                  progressBarColor: Colors.white,
+                  bufferedBarColor: Colors.white,
+                  baseBarColor: AppColors.progressBarWhite,
+                  thumbColor: Colors.white,
+                  thumbGlowRadius: 15,
+                  thumbRadius: 7,
+                  progress: controller.currentDuration.value,
+                  // buffered: Duration(milliseconds: 2000),
+
+                  total: Duration(
+                          milliseconds:
+                              controller.currentSong.value?.trackDuration ??
+                                  0) -
+                      controller.currentDuration.value,
+                  onSeek: (duration) {
+                    controller.seekDuration(duration);
+                  },
+                ),
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: SvgPicture.asset("assets/svg/shuffle.svg"),
+                  icon: SvgPicture.asset("assets/svg/shuffle_off.svg"),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(CupertinoIcons.backward_end),
+                  icon: SvgPicture.asset(
+                    "assets/svg/previous_song.svg",
+                    width: AppSpacings.w25,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => controller.playOrPause(),
+                  icon: Obx(
+                    () => SvgPicture.asset(
+                      controller.currentPlayerState.value == PlayerState.playing
+                          ? "assets/svg/pause_song.svg"
+                          : "assets/svg/play_song.svg",
+                      width: AppSpacings.w25,
+                    ),
+                  ),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(CupertinoIcons.play),
+                  icon: SvgPicture.asset(
+                    "assets/svg/next_song.svg",
+                    width: AppSpacings.w25,
+                  ),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(CupertinoIcons.forward_end),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(CupertinoIcons.repeat),
+                  icon: const Icon(
+                    CupertinoIcons.repeat,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
