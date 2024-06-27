@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dh_music/config/config_ex.dart';
 import 'package:dh_music/config/routes.dart';
 import 'package:dh_music/controller/file_path_controller.dart';
@@ -123,7 +124,7 @@ class SongPlayerWidget extends GetView<FilePathController> {
                   Obx(
                     () => InkWell(
                       borderRadius: BorderRadius.circular(50),
-                      onTap: controller.currentPath.isNotEmpty
+                      onTap: controller.currentSong.value != null
                           ? () {
                               controller.playOrPause();
                             }
@@ -132,8 +133,9 @@ class SongPlayerWidget extends GetView<FilePathController> {
                         radius: 20,
                         backgroundColor: Colors.transparent,
                         child: SvgPicture.asset(
-                          controller.playerState.value == PlayerState.playing &&
-                                  controller.playerState.value !=
+                          controller.currentPlayerState.value ==
+                                      PlayerState.playing &&
+                                  controller.currentPlayerState.value !=
                                       PlayerState.stopped
                               ? "assets/svg/pause_song.svg"
                               : "assets/svg/play_song.svg",

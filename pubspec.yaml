@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
 
   audioplayers: ^6.0.0
+  audio_video_progress_bar: ^2.0.3
   azlistview: ^2.0.0
   card_swiper: ^3.0.1
   cupertino_icons: ^1.0.8

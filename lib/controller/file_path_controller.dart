@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dh_music/utils/logging.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:get/get.dart';
 // ignore: unused_import
 import 'package:path_provider/path_provider.dart';
@@ -15,23 +16,22 @@ class MusicPaths {
   MusicPaths({required this.directoryPath, required this.filePaths});
 }
 
-enum PlayerState { stopped, playing, paused }
-
 class FilePathController extends GetxController {
   final player = AudioPlayer();
-  final RxList<MusicPaths> allMusic = <MusicPaths>[].obs;
+  final RxList<Metadata> allMusic = <Metadata>[].obs;
 
   final RxList<MusicPaths> directoryToFileNames = <MusicPaths>[].obs;
 
-  final Rx<PlayerState> playerState = PlayerState.stopped.obs;
+  final Rx<PlayerState> currentPlayerState = PlayerState.stopped.obs;
 
-  final RxList<String> musicQueue = <String>[].obs;
+  final RxList<Metadata> musicQueue = <Metadata>[].obs;
 
-  final RxString currentPath = "".obs;
+  final Rxn<Metadata> currentSong = Rxn<Metadata>();
   @override
   void onInit() {
     super.onInit();
     requestPermissionThenGetAllMp3Path();
+    listenToPlayerState();
   }
 
   void requestPermissionThenGetAllMp3Path() async {
@@ -73,7 +73,7 @@ class FilePathController extends GetxController {
     Stream<FileSystemEntity> files =
         dir.list(recursive: true, followLinks: false);
     files.listen(
-      (file) {
+      (file) async {
         String path = file.path;
         if (path.contains('/Android/')) {
           return;
@@ -84,7 +84,8 @@ class FilePathController extends GetxController {
 
           final fileName = path.substring(path.lastIndexOf('/') + 1);
           Logger.info(runtimeType, 'getAllPath fileName: $fileName');
-          allMusic.add(MusicPaths(directoryPath: path, filePaths: []));
+          //
+          allMusic.add(await MetadataRetriever.fromFile(File(path)));
           Logger.info(
               runtimeType, 'getAllPath allMusic count: ${allMusic.length}');
           final uniquePaths = directoryToFileNames
@@ -109,17 +110,26 @@ class FilePathController extends GetxController {
     });
   }
 
-  void addToQueue(String musicPath) {
-    musicQueue.add(musicPath);
+  void listenToPlayerState() {
+    player.onPlayerStateChanged.listen((event) {
+      currentPlayerState.value = event;
+    });
   }
 
-  void startMusic(String path) async {
-    Logger.info(runtimeType, 'playMusic path: $path');
+  // void addToQueue(String musicPath) {
+  //   musicQueue.add(musicPath);
+  // }
 
+  void startMusic(String path,
+      {List<Metadata> addToQueueList = const []}) async {
+    Logger.info(runtimeType, 'playMusic path: $path');
+    currentSong.value = await MetadataRetriever.fromFile(File(path));
     try {
+      if (musicQueue.isEmpty) {
+        musicQueue.addAll(addToQueueList);
+      }
       player.stop().then(
         (value) {
-          playerState.value == PlayerState.playing;
           player.play(DeviceFileSource(path));
         },
       );
@@ -129,11 +139,9 @@ class FilePathController extends GetxController {
   }
 
   void playOrPause() {
-    if (playerState.value == PlayerState.playing) {
-      playerState.value = PlayerState.paused;
+    if (currentPlayerState.value == PlayerState.playing) {
       player.pause();
-    } else if (playerState.value == PlayerState.paused) {
-      playerState.value = PlayerState.playing;
+    } else if (currentPlayerState.value == PlayerState.paused) {
       player.resume();
     }
   }
