@@ -113,14 +113,16 @@ class FavoriteTypeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: AppSpacings.ch(180),
+    var screenSize = MediaQuery.of(context).size;
+    double width = screenSize.width * 0.4;
+    double height = screenSize.height * 0.2;
+    return Flexible(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: AppSpacings.cw(150),
-            height: AppSpacings.ch(135),
+            width: width,
+            height: height * 0.9,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: Image.asset('assets/images/love_list.jpg').image,
@@ -154,78 +156,3 @@ class FavoriteTypeWidget extends StatelessWidget {
     );
   }
 }
-
-// class CounterWidget extends StatefulWidget {
-//   const CounterWidget({super.key});
-
-//   @override
-//   State<CounterWidget> createState() => _CounterWidgetState();
-// }
-
-// class _CounterWidgetState extends State<CounterWidget> {
-//   int count = 1;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       children: [
-//         Center(
-//           child: Text(
-//             count.toString(),
-//             style: const TextStyle(
-//               fontSize: 24,
-//               color: Colors.blue,
-//             ),
-//           ),
-//         ),
-//         Positioned(
-//           bottom: 20,
-//           right: 20,
-//           child: FloatingActionButton(
-//             onPressed: () {
-//               setState(() {
-//                 count++;
-//               });
-//             },
-//             child: const Icon(CupertinoIcons.add),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
-// RxInt count = 0.obs;
-// Rx<int> count = Rx<int>(0);
-
-// class CounterWidget extends StatelessWidget {
-//   CounterWidget({super.key});
-//   final RxInt count = 0.obs;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       children: [
-//         Center(
-//           child: Obx(
-//             () => Text(
-//               count.toString(),
-//               style: const TextStyle(
-//                 fontSize: 24,
-//                 color: Colors.blue,
-//               ),
-//             ),
-//           ),
-//         ),
-//         Positioned(
-//           bottom: 20,
-//           right: 20,
-//           child: FloatingActionButton(
-//             onPressed: () {
-//               count.value++;
-//             },
-//             child: const Icon(CupertinoIcons.add),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
