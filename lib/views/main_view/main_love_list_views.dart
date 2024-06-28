@@ -4,18 +4,41 @@ import 'package:flutter/material.dart';
 class FavoriteType {
   final String type;
   final List<String> musicPath;
+  final String imagePath;
 
-  FavoriteType({required this.type, required this.musicPath});
+  FavoriteType(
+      {required this.type, required this.musicPath, required this.imagePath});
 }
 
-final listFavortieType = [
-  FavoriteType(type: "Bài hát yêu thích", musicPath: ["1", "2", "3"]),
-  FavoriteType(type: "DownLoad", musicPath: ["1", "2", "3"]),
-  FavoriteType(type: "Branch music", musicPath: ["1", "2", "3"]),
-  FavoriteType(type: "Branch music", musicPath: ["1", "2", "3"]),
-  FavoriteType(type: "Branch music", musicPath: ["1", "2", "3"]),
-  FavoriteType(type: "Branch music", musicPath: ["1", "2", "3"]),
-  FavoriteType(type: "Branch music", musicPath: ["1", "2", "3"]),
+final listFavoriteType = [
+  FavoriteType(
+      type: "Bài hát yêu thích",
+      musicPath: ["1", "2", "3"],
+      imagePath: "assets/images/Banner1.jpg"),
+  FavoriteType(
+      type: "DownLoad",
+      musicPath: ["1", "2", "3"],
+      imagePath: 'assets/images/banner2.jpg'),
+  FavoriteType(
+      type: "Branch music",
+      musicPath: ["1", "2", "3"],
+      imagePath: 'assets/images/Banner1.jpg'),
+  FavoriteType(
+      type: "Branch 2 music",
+      musicPath: ["1", "2", "3"],
+      imagePath: 'assets/images/love_list.jpg'),
+  FavoriteType(
+      type: "Branch 3 music",
+      musicPath: ["1", "2", "3"],
+      imagePath: 'assets/images/love_list.jpg'),
+  FavoriteType(
+      type: "Branch 4 music",
+      musicPath: ["1", "2", "3"],
+      imagePath: 'assets/images/love_list.jpg'),
+  FavoriteType(
+      type: "Branch 5 music",
+      musicPath: ["1", "2", "3"],
+      imagePath: 'assets/images/love_list.jpg'),
 ];
 
 class LoveListView extends StatelessWidget {
@@ -23,7 +46,7 @@ class LoveListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int itemCount = listFavortieType.length;
+    int itemCount = listFavoriteType.length;
     int rows = (itemCount / 2).ceil();
     double gridHeight = rows * AppSpacings.ch(165) + (rows - 1) * 10;
     return Padding(
@@ -38,14 +61,16 @@ class LoveListView extends StatelessWidget {
               width: double.infinity,
               height: gridHeight,
               child: GridView.count(
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 30.0,
-                  children: listFavortieType
-                      .map((favoriteType) =>
-                          FavoriteTypeWidget(songTitle: favoriteType.type))
-                      .toList()),
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 10.0,
+                mainAxisSpacing: 30.0,
+                children: listFavoriteType
+                    .map((favoriteType) => FavoriteTypeWidget(
+                        songTitle: favoriteType.type,
+                        imagePath: favoriteType.imagePath))
+                    .toList(),
+              ),
             ),
             const Divider(
               indent: 15,
@@ -56,7 +81,7 @@ class LoveListView extends StatelessWidget {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                children: listFavortieType
+                children: listFavoriteType
                     .map((song) => const TopMusicWidget())
                     .toList(),
               ),
@@ -106,26 +131,24 @@ class TopMusicWidget extends StatelessWidget {
 
 class FavoriteTypeWidget extends StatelessWidget {
   final String songTitle;
-  const FavoriteTypeWidget({
-    super.key,
-    required this.songTitle,
-  });
+  final String imagePath;
+  const FavoriteTypeWidget(
+      {super.key, required this.songTitle, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    double width = screenSize.width * 0.4;
-    double height = screenSize.height * 0.2;
+    double width = AppSpacings.cw(145);
+    double height = AppSpacings.ch(130);
     return Flexible(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: width,
-            height: height * 0.9,
+            height: height,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: Image.asset('assets/images/love_list.jpg').image,
+                image: AssetImage(imagePath),
                 opacity: 0.5,
               ),
               borderRadius: BorderRadius.circular(10.0),
@@ -146,11 +169,13 @@ class FavoriteTypeWidget extends StatelessWidget {
               ],
             ),
           ),
-          Text("favorite song",
-              style: AppFonts.openSans(
-                fontSize: AppFontSizes.size12,
-                color: Colors.black,
-              ))
+          Text(
+            "favorite song",
+            style: AppFonts.openSans(
+              fontSize: AppFontSizes.size12,
+              color: Colors.black,
+            ),
+          ),
         ],
       ),
     );
