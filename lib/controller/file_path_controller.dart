@@ -16,6 +16,8 @@ class MusicPaths {
   MusicPaths({required this.directoryPath, required this.filePaths});
 }
 
+enum PlayType { all, single, repeat }
+
 class FilePathController extends GetxController {
   final player = AudioPlayer();
   final RxList<Metadata> allMusic = <Metadata>[].obs;
@@ -23,10 +25,15 @@ class FilePathController extends GetxController {
   final RxList<MusicPaths> directoryToFileNames = <MusicPaths>[].obs;
 
   final Rx<PlayerState> currentPlayerState = PlayerState.stopped.obs;
+  final Rx<PlayType> currentPlayeType = PlayType.all.obs;
 
   final RxList<Metadata> musicQueue = <Metadata>[].obs;
+  final RxList<Metadata> shuffledQueue = <Metadata>[].obs;
+
   final Rx<Duration> currentDuration = Rx<Duration>(Duration.zero);
   final Rxn<Metadata> currentSong = Rxn<Metadata>();
+
+  final RxBool isShuffle = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -39,10 +46,11 @@ class FilePathController extends GetxController {
     //Before using DeviceInfoPlugin make sure to re-build the app
     final operationSystemVersion = await DeviceInfoPlugin().androidInfo;
     final int sdkVersion = operationSystemVersion.version.sdkInt;
+    Logger.info(runtimeType,
+        'requestPermission Operating System Version: ${operationSystemVersion.version.sdkInt}');
     if (sdkVersion > 30) {
       final status = await Permission.audio.status;
-      Logger.info(runtimeType,
-          'Operating System Version: ${operationSystemVersion.version.sdkInt}');
+
       if (status.isGranted) {
         Logger.info(
             runtimeType, 'requestPermission Audio Permission is granted');
@@ -50,12 +58,11 @@ class FilePathController extends GetxController {
       } else {
         Logger.info(
             runtimeType, 'requestPermission Audio Permission is denied');
-        await Permission.audio.request();
+        await Permission.audio.request().whenComplete(() => _getAllMp3File());
       }
-    } else if (sdkVersion == 30) {
+    } else if (sdkVersion <= 30) {
       final status = await Permission.storage.status;
-      Logger.info(runtimeType,
-          'Operating System Version: ${operationSystemVersion.version.sdkInt}');
+
       if (status.isGranted) {
         Logger.info(
             runtimeType, 'requestPermission Storage Permission is granted');
@@ -63,8 +70,26 @@ class FilePathController extends GetxController {
       } else {
         Logger.info(
             runtimeType, 'requestPermission Storage Permission is denied');
-        await Permission.storage.request();
+        await Permission.storage.request().whenComplete(
+              () => _getAllMp3File(),
+            );
       }
+    }
+  }
+
+  void shuffle() {
+    if (isShuffle.value) {
+      shuffledQueue.clear();
+      shuffledQueue.addAll(musicQueue);
+      shuffledQueue.shuffle();
+      if (currentSong.value != null) {
+        shuffledQueue.removeWhere(
+            (element) => element.filePath == currentSong.value?.filePath);
+
+        shuffledQueue.insert(0, currentSong.value!);
+      }
+    } else {
+      shuffledQueue.clear();
     }
   }
 
@@ -106,17 +131,16 @@ class FilePathController extends GetxController {
       onError: (e) {
         Logger.error(runtimeType, "getAllPath cannot access directory: $e");
       },
-    ).onError((e) {
-      Logger.error(runtimeType, "getAllPath cannot access directory: $e");
-    });
+    );
   }
 
   void listenToPlayerState() {
     player.onPlayerStateChanged.listen((state) {
+      Logger.info(runtimeType, 'listenToPlayerState : $state');
       currentPlayerState.value = state;
-    });
-    player.onDurationChanged.listen((duration) {
-      Logger.info(runtimeType, 'listenToPlayerState duration: $duration');
+      if (currentPlayerState.value == PlayerState.completed) {
+        playNext();
+      }
     });
     player.onPositionChanged.listen((duration) {
       currentDuration.value = duration;
@@ -125,10 +149,49 @@ class FilePathController extends GetxController {
 
   void seekDuration(Duration duration) {
     Logger.info(runtimeType, 'seekDuration : $duration');
-    if (currentPlayerState.value == PlayerState.playing) {
-      player.seek(duration);
-
+    if (currentSong.value != null) {
       currentDuration.value = duration;
+      player.seek(duration);
+    }
+  }
+
+  void playPrevious() {
+    if (musicQueue.isNotEmpty && shuffledQueue.isEmpty) {
+      final index = musicQueue
+          .indexWhere((song) => currentSong.value?.filePath == song.filePath);
+
+      Logger.info(runtimeType, 'previousNext previous index $index');
+      if (index > 0) {
+        startMusic(musicQueue[index - 1].filePath ?? "");
+      }
+    } else if (shuffledQueue.isNotEmpty) {
+      final index = shuffledQueue
+          .indexWhere((song) => currentSong.value?.filePath == song.filePath);
+
+      Logger.info(runtimeType, 'previousNext previous index $index');
+      if (index > 0) {
+        startMusic(shuffledQueue[index - 1].filePath ?? "");
+      }
+    }
+  }
+
+  void playNext() {
+    if (musicQueue.isNotEmpty && shuffledQueue.isEmpty) {
+      final index = musicQueue
+          .indexWhere((song) => currentSong.value?.filePath == song.filePath);
+
+      Logger.info(runtimeType, 'previousNext previous index $index');
+      if (index >= 0 && index < musicQueue.length - 1) {
+        startMusic(musicQueue[index + 1].filePath ?? "");
+      }
+    } else if (shuffledQueue.isNotEmpty) {
+      final index = shuffledQueue
+          .indexWhere((song) => currentSong.value?.filePath == song.filePath);
+
+      Logger.info(runtimeType, 'previousNext previous index $index');
+      if (index >= 0 && index < shuffledQueue.length - 1) {
+        startMusic(shuffledQueue[index + 1].filePath ?? "");
+      }
     }
   }
 
@@ -155,6 +218,9 @@ class FilePathController extends GetxController {
       player.pause();
     } else if (currentPlayerState.value == PlayerState.paused) {
       player.resume();
+    } else if (currentPlayerState.value == PlayerState.completed) {
+      currentDuration.value = Duration.zero;
+      startMusic(currentSong.value?.filePath ?? "");
     }
   }
 
