@@ -25,6 +25,10 @@ class AppSpacings {
     return spaceSize.w;
   }
 
+  static double cdg(double spaceSize) {
+    return spaceSize.dg;
+  }
+
   /// Caclulate the height of the screen
   static double sh(double screenHeight) {
     return screenHeight.sh;
